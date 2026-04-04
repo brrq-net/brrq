@@ -1,0 +1,115 @@
+# =============================================================================
+# Brrq Node - Multi-stage Docker Build (TESTNET)
+# =============================================================================
+# Stage 1: Build the Rust binary
+# Stage 2: Minimal runtime image
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Stage 1: Builder
+# ---------------------------------------------------------------------------
+FROM rust:1.88-bookworm AS builder
+
+WORKDIR /build
+
+# Install build dependencies for native libraries (openssl, sqlite, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config \
+    libssl-dev \
+    libclang-dev \
+    clang \
+    cmake \
+    && rm -rf /var/lib/apt/lists/*
+
+# -- Layer cache: copy only Cargo manifests first --
+COPY Cargo.toml Cargo.lock ./
+
+# Copy each crate's Cargo.toml (preserving directory structure)
+COPY crates/brrq-crypto/Cargo.toml    crates/brrq-crypto/Cargo.toml
+COPY crates/brrq-types/Cargo.toml     crates/brrq-types/Cargo.toml
+COPY crates/brrq-vm/Cargo.toml        crates/brrq-vm/Cargo.toml
+COPY crates/brrq-state/Cargo.toml     crates/brrq-state/Cargo.toml
+COPY crates/brrq-sequencer/Cargo.toml crates/brrq-sequencer/Cargo.toml
+COPY crates/brrq-consensus/Cargo.toml crates/brrq-consensus/Cargo.toml
+COPY crates/brrq-prover/Cargo.toml    crates/brrq-prover/Cargo.toml
+COPY crates/brrq-network/Cargo.toml   crates/brrq-network/Cargo.toml
+COPY crates/brrq-bridge/Cargo.toml    crates/brrq-bridge/Cargo.toml
+COPY crates/brrq-sdk/Cargo.toml       crates/brrq-sdk/Cargo.toml
+COPY crates/brrq-node/Cargo.toml      crates/brrq-node/Cargo.toml
+COPY crates/brrq-wallet/Cargo.toml    crates/brrq-wallet/Cargo.toml
+COPY crates/brrq-api/Cargo.toml       crates/brrq-api/Cargo.toml
+COPY crates/brrq-indexer/Cargo.toml   crates/brrq-indexer/Cargo.toml
+COPY crates/brrq-portal/Cargo.toml   crates/brrq-portal/Cargo.toml
+COPY crates/brrq-bitcoin/Cargo.toml  crates/brrq-bitcoin/Cargo.toml
+
+# Create dummy source files so cargo can resolve the workspace and cache deps.
+# Each crate needs at least a lib.rs (or main.rs for the binary crate).
+RUN for crate in brrq-crypto brrq-types brrq-vm brrq-state brrq-sequencer \
+    brrq-consensus brrq-prover brrq-network brrq-bridge brrq-sdk \
+    brrq-wallet brrq-api brrq-indexer brrq-bitcoin brrq-portal; do \
+        mkdir -p crates/$crate/src && echo "" > crates/$crate/src/lib.rs; \
+    done && \
+    mkdir -p crates/brrq-node/src && echo "fn main() {}" > crates/brrq-node/src/main.rs
+
+# Build dependencies only (this layer is cached until Cargo.toml/lock changes)
+# TESTNET ONLY: allow-simulated-proofs enables deterministic HMAC-based proof
+# simulation. MUST be removed for mainnet — simulated proofs are forgeable.
+# phase4-placeholder enables fraud proof scaffolding (not production-ready).
+RUN cargo build --release --bin brrq-node --features "brrq-prover/allow-simulated-proofs,brrq-bridge/phase4-placeholder" 2>/dev/null || true
+
+# -- Now copy actual source code and genesis config --
+COPY crates/ crates/
+COPY testnet-genesis.toml testnet-genesis.toml
+
+# Touch all source files to invalidate the dummy build artifacts
+RUN find crates/ -name "*.rs" -exec touch {} +
+
+# Build the actual binary
+RUN cargo build --release --bin brrq-node --features "brrq-prover/allow-simulated-proofs,brrq-bridge/phase4-placeholder"
+
+# ---------------------------------------------------------------------------
+# Stage 2: Runtime
+# ---------------------------------------------------------------------------
+FROM debian:bookworm-slim AS runtime
+
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libssl3 \
+    ca-certificates \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN groupadd --gid 1000 brrq && \
+    useradd --uid 1000 --gid brrq --shell /bin/bash --create-home brrq
+
+# Create data directory
+RUN mkdir -p /data && chown brrq:brrq /data
+
+# Copy binary and default genesis from builder
+COPY --from=builder /build/target/release/brrq-node /usr/local/bin/brrq-node
+COPY --from=builder /build/testnet-genesis.toml /etc/brrq/testnet-genesis.toml
+
+# Switch to non-root user
+USER brrq
+
+# Expose ports
+#   8545  - JSON-RPC API (HTTP)
+#   8546  - WebSocket API
+#   30303 - P2P networking
+EXPOSE 8545 8546 30303
+
+# Data volume
+VOLUME ["/data"]
+
+ENTRYPOINT ["brrq-node"]
+
+# Default: full-node mode (NOT sequencer — sequencer requires explicit opt-in)
+CMD [ \
+    "--network", "testnet", \
+    "--rpc-port", "8545", \
+    "--ws-port", "8546", \
+    "--p2p-port", "30303", \
+    "--datadir", "/data", \
+    "--genesis", "/etc/brrq/testnet-genesis.toml" \
+]

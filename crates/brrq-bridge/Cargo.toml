@@ -1,0 +1,37 @@
+[package]
+name = "brrq-bridge"
+description = "Brrq bridge - BitVM2 integration, peg-in/peg-out"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[features]
+# phase4-placeholder is NOT in default features.
+# The placeholder Disprove script accepts ANY data as fraud proof, so it
+# must NEVER be compiled into production builds. Enable it explicitly for
+# testing only: `cargo test --features phase4-placeholder`.
+# dev-mode enables simulated proofs for development only.
+default = []
+phase4-placeholder = []
+dev-mode = ["brrq-prover/allow-simulated-proofs", "phase4-placeholder"]
+real-plonky2 = ["brrq-prover/real-plonky2"]
+## test-utils disables the simulated-SNARK guard so that
+## tests can exercise the full proof pipeline without a real Groth16/Plonky2
+## prover. MUST NOT be enabled in production — doing so allows forged proofs
+## to pass challenge verification and authorize withdrawals.
+test-utils = ["brrq-prover/test-utils"]
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+brrq-prover = { workspace = true }
+bitcoin = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+bincode = { workspace = true }
+hex = { workspace = true }
+tracing = { workspace = true }
+brrq-bitcoin = { workspace = true }
+imbl = { workspace = true }

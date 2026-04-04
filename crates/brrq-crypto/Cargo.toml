@@ -1,0 +1,32 @@
+[package]
+name = "brrq-crypto"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+description = "Brrq core cryptographic primitives: SHA-256, SLH-DSA, Schnorr, EOTS, Merkle trees"
+
+[features]
+default = []
+## TPM2 hardware key protection. Requires tpm2-tss library on Linux.
+tpm2 = ["tss-esapi"]
+
+[dependencies]
+sha2 = { workspace = true }
+secp256k1 = { workspace = true }
+rand = { workspace = true }
+hex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_bytes = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+zeroize = { version = "1.8.2", features = ["zeroize_derive"] }
+
+# TPM2 (optional — behind `tpm2` feature)
+tss-esapi = { version = "7", optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+tempfile = { workspace = true }

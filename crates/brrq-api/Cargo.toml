@@ -1,0 +1,51 @@
+[package]
+name = "brrq-api"
+description = "Brrq Web API — Axum HTTP + JSON-RPC + REST + WebSocket"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+# dev-mode enables simulated proofs for development only.
+# Production builds: cargo build --no-default-features --features real-plonky2
+[features]
+default = []
+dev-mode = ["brrq-prover/allow-simulated-proofs", "brrq-sequencer/dev-mode", "brrq-bridge/dev-mode"]
+real-plonky2 = ["brrq-prover/real-plonky2"]
+mev-protection = ["brrq-sequencer/mev-protection"]
+prover-pools = ["brrq-prover/prover-pools"]
+sequencer-rotation = ["brrq-consensus/sequencer-rotation"]
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+brrq-state = { workspace = true }
+brrq-sequencer = { workspace = true }
+brrq-consensus = { workspace = true }
+brrq-prover = { workspace = true }
+brrq-bridge = { workspace = true }
+brrq-bitcoin = { workspace = true }
+brrq-vm = { workspace = true }
+brrq-portal = { workspace = true }
+
+axum = { workspace = true, features = ["ws"] }
+hyper = "1.4"
+hyper-util = { version = "0.1.7", features = ["server", "tokio"] }
+tower = { workspace = true }
+tower-http = { workspace = true }
+async-stream = { workspace = true }
+
+tokio = { workspace = true }
+tokio-rustls = { workspace = true }
+rustls = { workspace = true }
+rustls-pemfile = "2"
+futures-util = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
+tracing = { workspace = true }
+imbl = { workspace = true }
+
+[dev-dependencies]
+brrq-state = { workspace = true, features = ["test-utils"] }

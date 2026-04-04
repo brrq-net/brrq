@@ -1,0 +1,28 @@
+[package]
+name = "brrq-consensus"
+description = "Brrq consensus - PoS, leader election, staking, slashing"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[features]
+default = []
+## Governance extensions for Phase 1+: technical council, doctrine firewall,
+## vote escrow, commit-reveal, decentralization tracking, fork logic, timelock,
+## deprecation tracking. Not needed for Phase 0 MVP.
+governance-extensions = []
+## Multi-sequencer rotation + open registration (Phase 5).
+sequencer-rotation = []
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+imbl = { workspace = true }
+hex = { workspace = true }
+
+[dev-dependencies]
+bincode = { workspace = true }

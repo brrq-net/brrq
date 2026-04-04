@@ -1,0 +1,35 @@
+[package]
+name = "brrq-sequencer"
+description = "Brrq sequencer - mempool, block building, dual signing"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[features]
+default = []
+dev-mode = ["brrq-bridge/dev-mode"]
+## MEV-protected encrypted mempool (commit-reveal ordering).
+mev-protection = []
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+brrq-vm = { workspace = true }
+brrq-state = { workspace = true }
+brrq-consensus = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+brrq-bridge = { workspace = true }
+brrq-prover = { workspace = true }
+brrq-portal = { workspace = true }
+brrq-bitcoin = { workspace = true }
+bitcoin = { workspace = true }
+imbl = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+elf = "0.7"

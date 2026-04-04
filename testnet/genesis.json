@@ -1,0 +1,46 @@
+{
+  "chain_id": 3078356993,
+  "chain_name": "Brrq L2 Testnet",
+  "timestamp": 0,
+  "config": {
+    "block_time_ms": 3000,
+    "block_gas_limit": 30000000,
+    "min_transaction_gas": 21000,
+    "base_fee_initial": 1,
+    "base_fee_max_change_rate_bps": 1250,
+    "target_gas_utilization_bps": 5000,
+    "eip1559_elasticity": 2
+  },
+  "portal": {
+    "min_lock_amount_sats": 546,
+    "min_timeout_blocks": 28800,
+    "max_timeout_blocks": 10512000,
+    "max_batch_size": 100,
+    "max_pool_slots": 20,
+    "settlement_grace_blocks": 2880,
+    "max_locks_per_address": 1000
+  },
+  "bridge": {
+    "challenge_mode": "Federated",
+    "federation_sunset_l1_height": 880000,
+    "required_confirmations": 6,
+    "deep_reorg_threshold": 5,
+    "peg_in_fee_bps": 50,
+    "daily_mint_cap_sats": 100000000000,
+    "per_tx_mint_cap_sats": 10000000000
+  },
+  "consensus": {
+    "epoch_length_blocks": 7200,
+    "min_stake_sats": 1000000,
+    "unbonding_period_blocks": 201600,
+    "slashing_penalty_bps": 500,
+    "max_validators": 200
+  },
+  "alloc": {
+    "brrq1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqfaucet0": {
+      "balance": 2100000000000000,
+      "note": "Testnet faucet — 21M brqBTC (testnet only)"
+    }
+  },
+  "initial_validators": []
+}

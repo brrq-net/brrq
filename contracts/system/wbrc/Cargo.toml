@@ -1,0 +1,19 @@
+[workspace]
+[package]
+name = "wbrc"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/brrq-net/brrq"
+homepage = "https://brrq.net"
+description = "Brrq wrapped BRC token contract"
+
+[dependencies]
+brrq-contract-sdk = { path = "../../brrq-contract-sdk" }
+
+[profile.release]
+opt-level = "s"      # optimize for binary size
+lto = true           # enable link time optimization
+codegen-units = 1    # reduce number of codegen units to increase optimizations
+panic = "abort"      # abort on panic
+strip = true         # strip symbols from binary

@@ -1,0 +1,173 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/brrq-crypto",
+    "crates/brrq-types",
+    "crates/brrq-vm",
+    "crates/brrq-state",
+    "crates/brrq-sequencer",
+    "crates/brrq-consensus",
+    "crates/brrq-prover",
+    "crates/brrq-network",
+    "crates/brrq-bridge",
+    "crates/brrq-sdk",
+    "crates/brrq-node",
+    "crates/brrq-wallet",
+    "crates/brrq-api",
+    "crates/brrq-indexer",
+    "crates/brrq-bitcoin",
+    "crates/brrq-portal",
+    "contracts/contract-tests",
+]
+# no_std/no_main contracts — cannot be tested on the host target (x86).
+# Build them separately with: cargo build --target riscv32im-unknown-none-elf -p proxy
+exclude = ["contracts/system/proxy", "crates/brrq-prover/sp1-program"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/brrq-net/brrq"
+homepage = "https://brrq.net"
+description = "Brrq: Bitcoin L2 with Hash-First Architecture"
+
+[workspace.dependencies]
+# Cryptography
+# Enable SHA-NI/AVX2 hardware acceleration.
+# Without `asm`, SHA-256 uses pure-Rust software fallback (~3x slower).
+# Build with RUSTFLAGS="-C target-cpu=native" for full hardware path.
+sha2 = { version = "0.10", features = ["asm"] }
+secp256k1 = { version = "0.30", features = ["rand", "global-context"] }
+rand = "0.8"
+hex = "0.4"
+serde_bytes = "0.11"
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+chacha20poly1305 = "0.10"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+bincode = "1"
+
+# Async
+tokio = { version = "1", features = ["full"] }
+tokio-util = "0.7"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+rocksdb = { version = "0.22", default-features = false, features = ["snappy"] }
+
+# TLS support for SDK client
+tokio-rustls = "0.26"
+rustls = "0.23"
+rustls-platform-verifier = "0.5"
+
+# WebSocket
+tokio-tungstenite = "0.26"
+futures-util = "0.3"
+
+# Web framework
+axum = "0.8"
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace", "compression-gzip", "timeout"] }
+
+# GraphQL
+async-graphql = "7"
+async-graphql-axum = "7"
+async-stream = "0.3"
+
+# Persistent immutable data structures (successor to unmaintained `im` crate)
+imbl = { version = "3", features = ["serde"] }
+
+# Configuration
+toml = "0.8"
+
+# Database
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# Benchmarking
+criterion = { version = "0.5", features = ["html_reports"] }
+
+# Internal crates
+brrq-crypto = { path = "crates/brrq-crypto" }
+brrq-types = { path = "crates/brrq-types" }
+brrq-vm = { path = "crates/brrq-vm" }
+brrq-state = { path = "crates/brrq-state" }
+brrq-sequencer = { path = "crates/brrq-sequencer" }
+brrq-consensus = { path = "crates/brrq-consensus" }
+# Simulated proofs are not enabled in workspace dependency.
+# Simulated proofs use a deterministic HMAC key that anyone can reproduce,
+# enabling proof forgery. Only dev/test/sim crates should enable this feature.
+brrq-prover = { path = "crates/brrq-prover" }
+brrq-network = { path = "crates/brrq-network" }
+brrq-bridge = { path = "crates/brrq-bridge" }
+brrq-sdk = { path = "crates/brrq-sdk" }
+brrq-api = { path = "crates/brrq-api" }
+brrq-indexer = { path = "crates/brrq-indexer" }
+brrq-bitcoin = { path = "crates/brrq-bitcoin" }
+brrq-portal = { path = "crates/brrq-portal" }
+
+# Bitcoin L1 integration
+bitcoincore-rpc = "0.19"
+bitcoin = { version = "0.32", features = ["serde", "rand-std"] }
+
+# HTTP client
+reqwest = { version = "0.12", features = ["json"] }
+
+# Testing
+tempfile = "3"
+
+# Parallelism
+rayon = "1.10"
+
+# ── Profile: optimize crypto in dev/test builds ─────────────────────
+# Without this, secp256k1/sha2/block-building takes ~8s per block in debug.
+# With opt-level=2, crypto drops to <0.5s per block — massive test speedup.
+[profile.dev.package.secp256k1]
+opt-level = 2
+
+[profile.dev.package.sha2]
+opt-level = 2
+
+[profile.dev.package.brrq-crypto]
+opt-level = 2
+
+# ── Workspace lints ─────────────────────────────────────────────────
+[workspace.lints.clippy]
+unwrap_used = "warn"
+
+[profile.dev.package.brrq-sequencer]
+opt-level = 2
+
+[profile.dev.package.brrq-vm]
+opt-level = 2
+
+[profile.test.package.secp256k1]
+opt-level = 2
+
+[profile.test.package.sha2]
+opt-level = 2
+
+[profile.test.package.brrq-crypto]
+opt-level = 2
+
+[profile.test.package.brrq-sequencer]
+opt-level = 2
+
+[profile.test.package.brrq-vm]
+opt-level = 2
+
+# ── Release profile: production hardening ─────────────────────────────
+# overflow-checks catch integer overflow in release builds.
+# LTO + codegen-units=1 improve both performance and security (fewer symbols).
+# strip removes debug symbols from production binaries.
+[profile.release]
+overflow-checks = true
+lto = true
+codegen-units = 1
+strip = true

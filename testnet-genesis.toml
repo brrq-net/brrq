@@ -1,0 +1,47 @@
+# Brrq Testnet Genesis Configuration
+# ===================================
+# All nodes must use the same genesis file to produce identical initial state.
+
+# ── Bootstrap Nodes ─────────────────────────────────────────────────
+# P2P addresses for initial peer discovery.
+# Format: "host:port"
+bootstrap_nodes = []
+
+[chain]
+# Chain ID: 0xB77C0001 (Brrq testnet)
+chain_id = 3078356993
+# Block production interval
+block_time_secs = 3
+# Blocks per epoch (~6 hours at 3s/block)
+epoch_length = 7200
+# Maximum gas per block
+block_gas_limit = 30000000
+# Initial stake cap (100 BTC in satoshis)
+initial_stake_cap = 10000000000
+# MEV protection: decentralized two-block commit-reveal split
+mev_mode = "decentralized"
+
+# ── Pre-funded Accounts ─────────────────────────────────────────────
+# Faucet account — 21M BTC for testnet distribution
+[[accounts]]
+address = "0x00000000000000000000000000000000deadfacc"
+balance = 2100000000000000
+
+# ── Initial Validators ──────────────────────────────────────────────
+# No pre-registered validators — the sequencer node registers itself
+# dynamically on startup. This ensures the node's auto-generated key
+# matches the only validator, so leader election always succeeds.
+# For multi-node testnet, use Docker Compose with shared keys.
+
+# ── Protocol Treasury ──────────────────────────────────────────────
+[treasury]
+address = "0x00000000000000000000000000000000000b77c0"
+initial_balance = 52560000000    # 525.6 BTC (bootstrap rewards fund)
+
+# ── Faucet Configuration ────────────────────────────────────────────
+[faucet]
+address = "0x00000000000000000000000000000000deadfacc"
+# 1 BTC per request
+drip_amount = 100000000
+# 1 hour cooldown per address
+cooldown_secs = 3600

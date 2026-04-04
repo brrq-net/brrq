@@ -1,0 +1,29 @@
+[package]
+name = "brrq-wallet"
+description = "Brrq CLI wallet and developer tools"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "brrq_wallet"
+path = "src/lib.rs"
+
+[[bin]]
+name = "brrq-wallet"
+path = "src/main.rs"
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+brrq-sdk = { workspace = true }
+brrq-state = { workspace = true }
+tokio = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
+zeroize = "1"
+rpassword = "7"

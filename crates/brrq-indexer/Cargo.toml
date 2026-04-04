@@ -1,0 +1,17 @@
+[package]
+name = "brrq-indexer"
+description = "Brrq blockchain indexer — SQLite-based block and transaction indexing"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+rusqlite = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
+tracing = { workspace = true }
