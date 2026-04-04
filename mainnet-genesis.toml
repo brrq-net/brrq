@@ -1,0 +1,66 @@
+# =============================================================================
+# Brrq Mainnet Genesis Configuration
+# =============================================================================
+# !! IMMUTABLE AFTER LAUNCH — DO NOT MODIFY !!
+#
+# This file defines the initial state of the Brrq mainnet.
+# All nodes MUST use the identical genesis to produce matching state roots.
+#
+# SHA256: (computed at release time and published)
+# =============================================================================
+
+# ── Bootstrap Nodes ──────────────────────────────────────────────────
+# Multi-provider, multi-continent seed peers.
+# Nodes also discover peers via DHT after initial bootstrap.
+bootstrap_nodes = []
+
+[chain]
+# Chain ID: 0xB77C0008 (Brrq mainnet)
+chain_id = 3078357000
+# Block production interval (3 seconds)
+block_time_secs = 3
+# Blocks per epoch (~6 hours at 3s/block)
+epoch_length = 7200
+# Maximum gas per block (30M)
+block_gas_limit = 30000000
+# Initial stake cap
+initial_stake_cap = 10000000000
+# sqrt(x) effective stake cap exponent
+stake_cap_exponent = "0.5"
+
+# ── Bridge Configuration ─────────────────────────────────────────────
+[bridge]
+# BitVM2 challenge period (2016 blocks ≈ 2 weeks on Bitcoin)
+challenge_period_blocks = 2016
+# Minimum operator stake
+min_operator_stake = 1000000000
+# Maximum bridge capacity
+max_bridge_capacity = 100000000000
+
+# ── Initial Validators ───────────────────────────────────────────────
+# Genesis validators with their initial stakes.
+# Dual signing: Schnorr(EOTS) + SLH-DSA for equivocation detection.
+
+[[validators]]
+# Validator 1 — Genesis sequencer
+address = "0x0000000000000000000000000000000000000001"
+stake = 100000000
+eots_pubkey = ""     # Replace with real validator public key (32-byte hex Schnorr pubkey)
+slh_dsa_pubkey = ""  # Replace with real validator public key (SLH-DSA-SHAKE-128f pubkey)
+
+[[validators]]
+# Validator 2 — Genesis sequencer (HA)
+address = "0x0000000000000000000000000000000000000002"
+stake = 100000000
+eots_pubkey = ""     # Replace with real validator public key
+slh_dsa_pubkey = ""  # Replace with real validator public key
+
+# ── Protocol Treasury ──────────────────────────────────────────────────
+# Receives 10% protocol share from every block's fees.
+[treasury]
+address = "0x00000000000000000000000000000000000b77c0"
+initial_balance = 52560000000    # Treasury initial balance
+
+# ── NO Faucet on Mainnet ─────────────────────────────────────────────
+# Value enters ONLY through BitVM2 bridge peg-in.
+# There is NO pre-funded account on mainnet (treasury is protocol-only).

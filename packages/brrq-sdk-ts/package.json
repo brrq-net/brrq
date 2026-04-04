@@ -1,0 +1,30 @@
+{
+  "name": "@brrq/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the Brrq Bitcoin L2 network",
+  "author": "brrq",
+  "homepage": "https://brrq.net",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brrq-net/brrq"
+  },
+  "bugs": {
+    "url": "https://github.com/brrq-net/brrq/issues"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@noble/curves": "^2.0.1",
+    "@noble/hashes": "^1.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.2"
+  },
+  "license": "MIT"
+}

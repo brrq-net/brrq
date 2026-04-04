@@ -1,0 +1,15 @@
+[package]
+name = "brrq-contract-sdk"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/brrq-net/brrq"
+homepage = "https://brrq.net"
+description = "SDK for writing smart contracts on the Brrq L2"
+
+[lib]
+# Contracts compile to riscv32im-unknown-none-elf
+# This crate provides the syscall wrappers and ABI helpers
+
+[features]
+default = []

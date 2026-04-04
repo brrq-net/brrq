@@ -1,0 +1,16 @@
+[package]
+name = "brrq-stark-verifier"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/brrq-net/brrq"
+homepage = "https://brrq.net"
+description = "SP1 guest program: runs Brrq STARK verifier inside SP1 RISC-V zkVM"
+
+# This is a standalone SP1 guest program — not part of the main workspace.
+# It uses SP1's RISC-V toolchain and cannot share dependencies with the host.
+[workspace]
+
+[dependencies]
+sp1-zkvm = "4"
+sha2 = { version = "0.10", default-features = false }

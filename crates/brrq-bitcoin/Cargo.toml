@@ -1,0 +1,49 @@
+[package]
+name = "brrq-bitcoin"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+description = "Bitcoin L1 integration for Brrq — RPC client, block monitoring, deposit watching, and OP_RETURN anchoring"
+
+[features]
+default = []
+## Canary mode: read-only mainnet shadow processing for validation against real data.
+## Not needed for production; enable for integration testing with mainnet.
+canary = []
+## Skip PoW validation in SPV tests — test fixtures use nonce=0 headers.
+## PoW logic is tested separately via validate_pow() unit tests.
+## NEVER enable in production builds.
+skip-pow-in-tests = []
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+
+# Bitcoin
+bitcoincore-rpc = { workspace = true }
+bitcoin = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+
+# Crypto
+sha2 = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+zeroize = "1.8.2"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
+bincode = { workspace = true }
+
+# Enable skip-pow-in-tests for integration tests — test fixtures use nonce=0
+# headers that can't satisfy PoW. PoW is tested via validate_pow() unit tests.
+brrq-bitcoin = { path = ".", features = ["skip-pow-in-tests"] }

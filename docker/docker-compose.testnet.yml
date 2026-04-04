@@ -1,0 +1,157 @@
+# =============================================================================
+# Brrq Testnet — Multi-Node Docker Compose
+# =============================================================================
+# Usage:
+#   docker compose -f docker/docker-compose.testnet.yml up --build
+#
+# This starts 3 nodes:
+#   - seed-node:    Sequencer + first bootstrap node (API on :8545)
+#   - validator-2:  Sequencer + connects to seed (API on :8547)
+#   - full-node:    Non-sequencer + public API (API on :8546)
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Seed Node — primary sequencer and bootstrap peer
+  # ---------------------------------------------------------------------------
+  seed-node:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.node
+    container_name: brrq-seed
+    ports:
+      - "8545:8545"   # JSON-RPC API
+      - "30303:30303" # P2P networking
+    volumes:
+      - seed-data:/data
+    command:
+      - "--network"
+      - "testnet"
+      - "--sequencer"
+      - "--rpc-port"
+      - "8545"
+      - "--ws-port"
+      - "8546"
+      - "--p2p-port"
+      - "30303"
+      - "--datadir"
+      - "/data"
+      - "--batch-size"
+      - "10"
+      - "--genesis"
+      - "/etc/brrq/testnet-genesis.toml"
+      - "--mev-mode"
+      - "decentralized"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8545/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # ---------------------------------------------------------------------------
+  # Validator 2 — second sequencer, connects to seed
+  # ---------------------------------------------------------------------------
+  validator-2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.node
+    container_name: brrq-validator-2
+    ports:
+      - "8547:8545"   # JSON-RPC API (mapped to 8547 on host)
+      - "30304:30303" # P2P networking
+    volumes:
+      - validator2-data:/data
+    command:
+      - "--network"
+      - "testnet"
+      - "--sequencer"
+      - "--rpc-port"
+      - "8545"
+      - "--ws-port"
+      - "8546"
+      - "--p2p-port"
+      - "30303"
+      - "--datadir"
+      - "/data"
+      - "--batch-size"
+      - "10"
+      - "--genesis"
+      - "/etc/brrq/testnet-genesis.toml"
+      - "--bootstrap"
+      - "seed-node:30303"
+      - "--mev-mode"
+      - "decentralized"
+    depends_on:
+      seed-node:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8545/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # ---------------------------------------------------------------------------
+  # Full Node — non-sequencer, public API access
+  # ---------------------------------------------------------------------------
+  full-node:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.node
+    container_name: brrq-full-node
+    ports:
+      - "8546:8545"   # JSON-RPC API (mapped to 8546 on host)
+      - "30305:30303" # P2P networking
+    volumes:
+      - fullnode-data:/data
+    command:
+      - "--network"
+      - "testnet"
+      - "--rpc-port"
+      - "8545"
+      - "--ws-port"
+      - "8546"
+      - "--p2p-port"
+      - "30303"
+      - "--datadir"
+      - "/data"
+      - "--genesis"
+      - "/etc/brrq/testnet-genesis.toml"
+      - "--bootstrap"
+      - "seed-node:30303"
+    depends_on:
+      seed-node:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8545/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+volumes:
+  seed-data:
+    driver: local
+  validator2-data:
+    driver: local
+  fullnode-data:
+    driver: local

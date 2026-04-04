@@ -1,0 +1,33 @@
+[package]
+name = "brrq-sdk"
+description = "Brrq developer SDK - client, wallet, contract tools"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+# dev-mode enables simulated proofs for development only.
+# brrq-prover is optional — only pulled in by light-client, dev-mode, or real-plonky2.
+# This lets brrq-wallet (which needs only Client + Wallet) build without a prover.
+[features]
+default = []
+dev-mode = ["dep:brrq-prover", "brrq-prover/allow-simulated-proofs"]
+real-plonky2 = ["dep:brrq-prover", "brrq-prover/real-plonky2"]
+light-client = ["dep:brrq-prover"]
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+brrq-state = { workspace = true }
+brrq-prover = { workspace = true, optional = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+hex = { workspace = true }
+
+# TLS support — all https:// connections use real TLS via rustls
+tokio-rustls = { workspace = true }
+rustls = { workspace = true }
+rustls-platform-verifier = { workspace = true }

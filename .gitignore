@@ -1,0 +1,28 @@
+# Build artifacts
+/target/
+check.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — NEVER commit
+validator-keys.json
+**/validator-keys.json
+*.key
+*.pem
+
+# Data directories
+/brrq-data/
+/data/
+
+# Environment
+.env
+.env.*
+brrq/

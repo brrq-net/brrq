@@ -1,0 +1,27 @@
+[package]
+name = "brrq-state"
+description = "Brrq state management - world state, account DB, Merkle trie"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[features]
+test-utils = ["dep:tempfile"]
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+brrq-bitcoin = { workspace = true }
+thiserror = { workspace = true }
+rocksdb = { workspace = true }
+serde = { workspace = true }
+bincode = { workspace = true }
+hex = { workspace = true }
+tracing = { workspace = true }
+tempfile = { workspace = true, optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+tempfile = { workspace = true }

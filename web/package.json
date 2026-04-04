@@ -1,0 +1,39 @@
+{
+  "name": "brrq-explorer",
+  "version": "0.1.0",
+  "author": "brrq",
+  "license": "MIT",
+  "homepage": "https://brrq.net",
+  "repository": { "type": "git", "url": "https://github.com/brrq-net/brrq" },
+  "bugs": { "url": "https://github.com/brrq-net/brrq/issues" },
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@tanstack/react-query": "^5.65.0",
+    "lucide-react": "^0.475.0",
+    "react-markdown": "^9.0.0",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/react": "^19.0.0",
+    "@types/node": "^22.0.0",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "postcss": "^8.5.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "jsdom": "^25.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^15.2.0"
+  }
+}

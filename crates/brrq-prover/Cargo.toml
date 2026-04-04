@@ -1,0 +1,58 @@
+[package]
+name = "brrq-prover"
+description = "Brrq prover - STARK proof generation and verification"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[features]
+default = []
+## test-utils enables simulated SNARK paths. MUST NOT be enabled
+## in production builds — simulated proofs use a deterministic HMAC key that
+## anyone can reproduce, allowing proof forgery and bridge fund theft.
+test-utils = ["allow-simulated-proofs"]
+## Real SP1 + Groth16 prover. When enabled, SP1 runs the STARK verifier in
+## a RISC-V zkVM and wraps the result into a ~260-byte Groth16 proof.
+## is_simulated() returns false for Sp1Groth16 proofs.
+## REQUIRES: sp1-sdk and a compiled SP1 ELF binary (see sp1-program/).
+real-sp1 = ["sp1-sdk"]
+## DEPRECATED: Real Plonky2 FRI-based prover (Plonky2 is deprecated).
+## Retained for backward compatibility. New code should use `real-sp1`.
+## REQUIRES: nightly Rust (`rustup run nightly cargo build --features real-plonky2`)
+## because plonky2_field uses #![feature(specialization)].
+real-plonky2 = ["plonky2", "plonky2_field"]
+## Escape hatch for dev/test builds to suppress the compile_error! when
+## real-plonky2 is not available. MUST NOT be enabled in production.
+allow-simulated-proofs = []
+## GPU acceleration via CUDA. Requires NVIDIA GPU + CUDA toolkit at runtime.
+## Accelerates NTT, Merkle hashing, and FRI folding (10-50x speedup).
+gpu-cuda = ["cudarc"]
+## Cooperative prover pools + ZKLA liveness recovery (Phase 2+).
+prover-pools = []
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+brrq-vm = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+bincode = { workspace = true }
+rayon = { workspace = true }
+tracing = { workspace = true }
+imbl = { workspace = true }
+
+
+# SP1 (optional — behind `real-sp1` feature)
+sp1-sdk = { version = "4", optional = true }
+
+# Plonky2 (optional — behind `real-plonky2` feature, DEPRECATED)
+plonky2 = { version = "1", optional = true }
+plonky2_field = { version = "1", optional = true }
+
+# CUDA GPU acceleration (optional — behind `gpu-cuda` feature)
+cudarc = { version = "0.12", optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true }

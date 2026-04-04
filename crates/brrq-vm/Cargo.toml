@@ -1,0 +1,16 @@
+[package]
+name = "brrq-vm"
+description = "Brrq RISC-V zkVM (RV32IM) - execution environment"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }

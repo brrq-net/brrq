@@ -1,0 +1,15 @@
+[package]
+name = "contract-tests"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Integration tests for Brrq system contracts (proxy, treasury, wbrc)"
+publish = false
+
+[dependencies]
+brrq-vm = { workspace = true }
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+
+[build-dependencies]
+object = { version = "0.36", default-features = false, features = ["elf", "read"] }

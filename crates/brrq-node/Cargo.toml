@@ -1,0 +1,78 @@
+[package]
+name = "brrq-node"
+description = "Brrq full node"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "brrq_node"
+path = "src/lib.rs"
+
+[[bin]]
+name = "brrq-node"
+path = "src/main.rs"
+
+[[bin]]
+name = "keygen"
+path = "src/bin/keygen.rs"
+
+# Simulated proofs are NOT enabled by default.
+# - For development/testing: cargo build --features dev-mode
+# - For production: cargo build --features real-plonky2
+# Without either feature, compilation fails with a clear error message
+# from brrq-prover's compile_error! guard.
+[features]
+default = []
+dev-mode = ["brrq-prover/allow-simulated-proofs", "brrq-sequencer/dev-mode", "brrq-bridge/dev-mode", "brrq-api/dev-mode"]
+real-plonky2 = ["brrq-prover/real-plonky2"]
+mev-protection = ["brrq-sequencer/mev-protection"]
+prover-pools = ["brrq-prover/prover-pools"]
+sequencer-rotation = ["brrq-consensus/sequencer-rotation"]
+gpu-cuda = ["brrq-prover/gpu-cuda"]
+io-uring = ["dep:io-uring"]
+ebpf-monitor = ["dep:aya"]
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+brrq-vm = { workspace = true }
+brrq-state = { workspace = true }
+brrq-sequencer = { workspace = true }
+brrq-consensus = { workspace = true }
+brrq-prover = { workspace = true }
+brrq-network = { workspace = true }
+brrq-bridge = { workspace = true }
+brrq-api = { workspace = true }
+brrq-bitcoin = { workspace = true }
+brrq-indexer = { workspace = true }
+brrq-portal = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+clap = { version = "4", features = ["derive", "env"] }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
+# sled removed — storage is now handled via brrq-state (RocksDB)
+bincode = { workspace = true }
+rand = { workspace = true }
+toml = { workspace = true }
+bitcoin.workspace = true
+reqwest = { version = "0.12", features = ["json"] }
+imbl = { workspace = true }
+
+# Platform: sandboxing (Linux only — landlock filesystem + seccomp syscall filter)
+[target.'cfg(target_os = "linux")'.dependencies]
+landlock = "0.4"
+seccompiler = "0.4"
+io-uring = { version = "0.7", optional = true }
+aya = { version = "0.13", optional = true }
+
+[dev-dependencies]
+brrq-sdk = { workspace = true }
+brrq-state = { workspace = true, features = ["test-utils"] }

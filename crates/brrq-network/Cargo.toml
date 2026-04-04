@@ -1,0 +1,38 @@
+[package]
+name = "brrq-network"
+description = "Brrq networking - P2P, gossip, sync, RPC"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+homepage.workspace = true
+
+[features]
+default = ["native-p2p"]
+## Current custom P2P (Noise_XK + TCP, production-hardened).
+native-p2p = []
+## libp2p-based P2P stack. When enabled, replaces native transport with
+## libp2p for structured peer discovery (Kademlia), NAT traversal, and
+## protocol multiplexing. Message types and gossip logic are shared.
+libp2p-transport = ["libp2p", "libp2p-noise", "libp2p-tcp", "libp2p-yamux", "libp2p-gossipsub", "libp2p-kad", "libp2p-identify"]
+
+[dependencies]
+brrq-crypto = { workspace = true }
+brrq-types = { workspace = true }
+hex = { workspace = true }
+tokio = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+tracing = { workspace = true }
+x25519-dalek = { workspace = true }
+chacha20poly1305 = { workspace = true }
+rand = { workspace = true }
+
+# libp2p (optional — behind `libp2p-transport` feature)
+libp2p = { version = "0.54", optional = true, features = ["tokio", "noise", "tcp", "yamux", "gossipsub", "kad", "identify", "macros"] }
+libp2p-noise = { version = "0.45", optional = true }
+libp2p-tcp = { version = "0.42", optional = true, features = ["tokio"] }
+libp2p-yamux = { version = "0.46", optional = true }
+libp2p-gossipsub = { version = "0.47", optional = true }
+libp2p-kad = { version = "0.46", optional = true }
+libp2p-identify = { version = "0.45", optional = true }
